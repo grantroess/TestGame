@@ -3,6 +3,7 @@ package testGame;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -18,7 +19,7 @@ public class TestGame implements ApplicationListener {
 	private Sprite bob;
 	private SpriteBatch BobBatch;
 	
-	private float speed = 5f; 					//We want it to move this amount every second.
+	private float speed = 15f; 					//We want it to move this amount every second.
 	private Vector2 direction = new Vector2(0,0); 	//Direction which we will move.
 	
 	@Override
@@ -55,6 +56,10 @@ public class TestGame implements ApplicationListener {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);		
 		
+		/* * * * * * * * * * *
+		 *   MOUSE MOVEMENT  *
+		 * * * * * * * * * * */
+		
 		if(Gdx.input.isButtonPressed(Buttons.LEFT)) //If LEFT mouse button is pressed.
 		{
 			float diffx = Gdx.input.getX() - bob.getX() - bob.getOriginX();
@@ -66,6 +71,35 @@ public class TestGame implements ApplicationListener {
 				direction.mul(speed * Gdx.graphics.getDeltaTime());
 				bob.translate(direction.x,direction.y);
 			}
+		}
+		
+		/* * * * * * * * * * *
+		 *   KEY MOVEMENT  *
+		 * * * * * * * * * * */
+
+		direction.set(0, 0);
+		
+		if(Gdx.input.isKeyPressed(Keys.W))
+		{
+			direction.add(0,1);
+		}
+		if(Gdx.input.isKeyPressed(Keys.A))
+		{
+			direction.add(-1,0);
+		}
+		if(Gdx.input.isKeyPressed(Keys.S))
+		{
+			direction.add(0,-1);
+		}
+		if(Gdx.input.isKeyPressed(Keys.D))
+		{
+			direction.add(1,0);
+		}
+		if(direction.len2() >= 1)
+		{
+			direction.nor();
+			direction.mul(speed * Gdx.graphics.getDeltaTime());
+			bob.translate(direction.x,direction.y);
 		}
 		
 		BobBatch.setProjectionMatrix(camera.combined);
