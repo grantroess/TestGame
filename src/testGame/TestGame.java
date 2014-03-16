@@ -2,25 +2,18 @@ package testGame;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Vector2;
 
 public class TestGame implements ApplicationListener {
 	private OrthographicCamera camera;
 	
-	private Texture tex;
-	private Sprite bob;
+	private Bob b;
 	private SpriteBatch BobBatch;
 	
-	private float speed = 15f; 					//We want it to move this amount every second.
-	private Vector2 direction = new Vector2(0,0); 	//Direction which we will move.
+	private Texture bg;
 	
 	@Override
 	public void create() {		
@@ -32,14 +25,14 @@ public class TestGame implements ApplicationListener {
 		
 		camera.translate(camera.viewportWidth/2, camera.viewportHeight/2); 	//Moving the camera so (0,0) becomes lower left corner instead of center.
 		camera.update();													//Updating the camera.
-		tex = new Texture(Gdx.files.internal("data/bob16x16.png"));
-		//tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
-		bob = new Sprite(tex);
-		bob.setSize(16f, 16f * bob.getHeight() / bob.getWidth());
-		bob.setOrigin(bob.getWidth()/2, bob.getHeight()/2);
-		bob.setPosition(bob.getX() - bob.getOriginX(), bob.getY() - bob.getOriginY());
+		b = new Bob("data/bob16x16.png");
+		b.setSize(16f, true);
+		b.setOrigin(b.getSize().x/2, b.getSize().y/2);
+		b.setPosition(0, 0);
 		
+		
+		bg = new Texture(Gdx.files.internal("data/testgamemap.png"));
 	
 	}
 	
@@ -48,64 +41,20 @@ public class TestGame implements ApplicationListener {
 	@Override
 	public void dispose() {
 		BobBatch.dispose();
-		tex.dispose();
+		b.dispose();
 	}
 
 	@Override
 	public void render() {		
 		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);		
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);	
 		
-		/* * * * * * * * * * *
-		 *   MOUSE MOVEMENT  *
-		 * * * * * * * * * * */
-		
-		if(Gdx.input.isButtonPressed(Buttons.LEFT)) //If LEFT mouse button is pressed.
-		{
-			float diffx = Gdx.input.getX() - bob.getX() - bob.getOriginX();
-			float diffy = (Gdx.graphics.getHeight() - Gdx.input.getY()) - bob.getY() - bob.getOriginY();
-			direction.set(diffx, diffy);
-			if (direction.len2() > 1)
-			{
-				direction.nor();
-				direction.mul(speed * Gdx.graphics.getDeltaTime());
-				bob.translate(direction.x,direction.y);
-			}
-		}
-		
-		/* * * * * * * * * * *
-		 *   KEY MOVEMENT  *
-		 * * * * * * * * * * */
-
-		direction.set(0, 0);
-		
-		if(Gdx.input.isKeyPressed(Keys.W))
-		{
-			direction.add(0,1);
-		}
-		if(Gdx.input.isKeyPressed(Keys.A))
-		{
-			direction.add(-1,0);
-		}
-		if(Gdx.input.isKeyPressed(Keys.S))
-		{
-			direction.add(0,-1);
-		}
-		if(Gdx.input.isKeyPressed(Keys.D))
-		{
-			direction.add(1,0);
-		}
-		if(direction.len2() >= 1)
-		{
-			direction.nor();
-			direction.mul(speed * Gdx.graphics.getDeltaTime());
-			bob.translate(direction.x,direction.y);
-		}
+		b.update();
 		
 		BobBatch.setProjectionMatrix(camera.combined);
 		BobBatch.begin();
-		bob.draw(BobBatch);
-		
+		BobBatch.draw(bg, 0, 0, camera.viewportWidth, camera.viewportHeight);
+		b.draw(BobBatch);
 		BobBatch.end();
 	}
 
